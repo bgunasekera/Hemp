@@ -1,2 +1,2 @@
 # Hemp
-Hemp scripts
+megafile_analysis = scripts used in analysing MIDT performance 
