@@ -127,6 +127,21 @@ false= df.groupby(['drug', 'False']).size().copy()
 false_percentage = false.groupby(level=0).apply(lambda x:
                                                  100 * x / float(x.sum()))
     
+neutral = df[df['CueName'] == 'control'].copy()
+salient = df[df['Salient'] == 'Salient'].copy()
+
+neutral= df.groupby(['drug', 'False']).size().copy()
+
+
+neutral_percentage = neutral.groupby(level=0).apply(lambda x:
+                                                 100 * x / float(x.sum()))
+    
+salient= df.groupby(['drug', 'False']).size().copy()
+
+
+salient_percentage = false.groupby(level=0).apply(lambda x:
+                                                 100 * x / float(x.sum()))
+
 
 m = 'false_start ~ drug*Salient'
 blogistic = smf.logit(formula = str(m), data = df_hc_plb_false).fit()
@@ -146,7 +161,7 @@ params = blogistic.params
 conf = blogistic.conf_int()
 conf['Odds Ratio'] = params
 conf.columns = ['5%', '95%', 'Odds Ratio']
-print(np.exp(conf)) ######################### CHANGE THIS ODDS RATIO FOR DRUG ########################
+print(np.exp(conf))
 
 
 #%%
@@ -160,6 +175,10 @@ df_rt['Salient'] = df_rt['Salient'].astype(object)
 
 
 df_rt.groupby(['drug']).RT.agg(['mean', 'std'])
+neutral = df_rt[df_rt['CueName'] == 'control'] 
+neutral.groupby(['drug']).RT.agg(['mean', 'std'])
+salient = df_rt[df_rt['Salient'] == 0] 
+salient.groupby(['drug']).RT.agg(['mean', 'std'])
 
 
 hc_plb_RT = df_rt.copy()
@@ -167,7 +186,7 @@ hc_plb_RT = hc_plb_RT[hc_plb_RT['drug'] != 'cbd']
 
 plb_cbd_RT = df_rt.copy()
 plb_cbd_RT = plb_cbd_RT[plb_cbd_RT['drug'] != 'HC']
-#plb_cbd_RT = plb_cbd_RT[plb_cbd_RT.SubjectID != '17']
+plb_cbd_RT = plb_cbd_RT[plb_cbd_RT.SubjectID != '17']
 
 #%%
 aov = pg.anova(dv='RT', between=['drug', 'Salient'], ss_type=3, data=hc_plb_RT)
@@ -175,16 +194,8 @@ pg.print_table(aov)
 
 
 #%%
-aov1 = pg.anova(dv='RT', between=['drug', 'Salient'], ss_type=3, data=plb_cbd_RT)
+aov1 = pg.rm_anova(dv='RT', within=['drug', 'Salient'], subject='SubjectID', data=plb_cbd_RT)
 pg.print_table(aov1)
-
-
-
-
-
-
-
-
 
 
 
